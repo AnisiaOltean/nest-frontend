@@ -3,7 +3,7 @@ import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import { LoginPage } from "./features/auth/LoginPage";
 import { RegistrationPage } from "./features/auth/RegistrationPage";
 import { PrivateRoute } from "./features/auth/PrivateRoute";
-import { HomePage } from "./features/cats/HomePage";
+import { HomePage } from "./features/user/HomePage";
 
 
 export const App = () => (

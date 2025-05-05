@@ -1,10 +1,10 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
-import { JWT, User } from "../../app/types";
+import { JWT, StoredUser, User } from "../../app/types";
 import authService from "./AuthAPI";
 import { RootState } from "../../app/store";
 
 const storedUser: string | null = localStorage.getItem('user');
-const user: string | null = !!storedUser ? JSON.parse(storedUser) : null;
+const user: StoredUser | null = !!storedUser ? JSON.parse(storedUser) : null;
 
 const storedJwt: string | null = localStorage.getItem('jwt');
 const jwt: JWT | null = !!storedJwt ? JSON.parse(storedJwt) : null;
@@ -17,12 +17,12 @@ interface AsyncState {
 }
 
 interface AuthState extends AsyncState {
-    user?: string | null;
+    user?: StoredUser | null;
     jwt?: JWT;
     isAuthenticated?: boolean;
 }
 
-const  initialState: AuthState = {
+const initialState: AuthState = {
     user: user,
     jwt: jwt,
     isLoading: false,
@@ -87,7 +87,7 @@ export const authSlice = createSlice({
             state.isLoading = false;
             state.isSuccess = true;
             console.log(action.payload);
-            state.user = action.payload?.email;
+            state.user = null;
         })
         .addCase(register.rejected, (state) => {
             state.isLoading = false;

@@ -1,5 +1,5 @@
 import axios from "axios";
-import { User, JWT, DecodedJwt } from "../../app/types";
+import { User, JWT, DecodedJwt, StoredUser } from "../../app/types";
 import { jwtDecode } from "jwt-decode";
 
 const registerAPI = async (user: User): Promise<User|null> => {
@@ -8,7 +8,7 @@ const registerAPI = async (user: User): Promise<User|null> => {
     return response.data;
 }
 
-const loginAPI = async(user: User): Promise<{access_token: JWT; user: string | null}> => {
+const loginAPI = async(user: User): Promise<{access_token: JWT; user: StoredUser | null}> => {
     const response = await axios.post(`${import.meta.env.VITE_BASE_API}/auth/login`, user);
     
     console.log(response.data); 
@@ -18,11 +18,16 @@ const loginAPI = async(user: User): Promise<{access_token: JWT; user: string | n
 
         const decodedJWT: DecodedJwt = jwtDecode(response.data.access_token);
         console.log(decodedJWT);
-        localStorage.setItem('user', JSON.stringify(decodedJWT.email));
+        const storedUser: StoredUser = {
+            id: decodedJWT.sub,
+            email: decodedJWT.email
+        }
+
+        localStorage.setItem('user', JSON.stringify(storedUser));
 
         return {
             access_token: response.data.access_token,
-            user: decodedJWT.email,
+            user: storedUser,
           };
     }
 

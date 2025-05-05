@@ -1,0 +1,1 @@
+# Frontend using React + Redux toolkit for state management
