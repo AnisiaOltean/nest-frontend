@@ -32,14 +32,34 @@ export const catApi = createApi({
             method: 'POST',
             body: newCat,
           }),
-          invalidatesTags: (result, error, { ownerId }) => [{ type: 'Cats', id: String(ownerId) }],
+          invalidatesTags: (result, error, { ownerId }) => [{ type: 'Cats' as const, id: String(ownerId) }],
         }),
       
         getCatsForUser: builder.query<Cat[], string>({
           query: (userId) => `cats?ownerId=${userId}`,
-          providesTags: (result, error, userId) => [{ type: 'Cats', id: String(userId) }],
+          providesTags: (result, error, userId) => [{ type: 'Cats' as const, id: String(userId) }],
+        }),
+
+        getCatById: builder.query<Cat, string>({
+          query: (catId) => `cats/${catId}`,
+        }),
+        updateCat: builder.mutation<Cat, { catId: string; details: CatDetails}>({
+          query: ({catId, details}) => ({
+            url: `cats/${Number(catId)}`,
+            method: 'PATCH',
+            body: details,
+          }),
+          invalidatesTags: (result, error, { catId, details }) => [{ type: 'Cats' as const, id: String(details.ownerId) }],
+        }),
+
+        deleteCat: builder.mutation<void, { catId: number; ownerId: number}>({
+          query: ({catId, ownerId}) => ({
+            url: `cats/${catId}`,
+            method: 'DELETE',
+          }),
+          invalidatesTags: (result, error, { catId, ownerId }) => [{ type: 'Cats' as const, id: String(ownerId) }],
         }),
       }),
 });
 
-export const { useCreateCatMutation, useGetCatsForUserQuery } = catApi;
+export const { useCreateCatMutation, useGetCatByIdQuery, useGetCatsForUserQuery, useUpdateCatMutation, useDeleteCatMutation } = catApi;

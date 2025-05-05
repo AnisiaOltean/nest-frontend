@@ -6,8 +6,33 @@ import Button from '@mui/material/Button';
 import Typography from '@mui/material/Typography';
 import SentimentSatisfiedAltIcon from '@mui/icons-material/SentimentSatisfiedAlt';
 import SentimentDissatisfiedIcon from '@mui/icons-material/SentimentDissatisfied';
+import { useNavigate } from "react-router";
+import { useDeleteCatMutation } from "./CatsAPI";
+import { useAppSelector } from "../../app/hooks/redux/hooks";
+import { useState } from "react";
+import { Snackbar, Alert } from "@mui/material";
 
 export const CatCard = ({ id, name, breed, isFed }: Cat) => {
+    const navigate = useNavigate();
+    const [ deleteCat ] = useDeleteCatMutation();
+    const { user } = useAppSelector((state) => state.auth);
+    const [error, setError] = useState(false);
+
+    const handleUpdate = () => {
+      navigate(`/cats/${id}`);
+    }
+
+    const handleDelete = async () => {
+      if(!user) return;
+
+        try {
+          await deleteCat({catId: id!, ownerId: user.id}).unwrap();
+          navigate('/');
+        } catch (err) {
+          setError(true);
+        }
+    }
+
     return (
         <Card sx={{ minWidth: 275 }}>
           <CardContent>
@@ -26,8 +51,14 @@ export const CatCard = ({ id, name, breed, isFed }: Cat) => {
             </Typography>
           </CardContent>
           <CardActions>
-            <Button size="small">Update</Button>
+            <Button size="small" onClick={handleUpdate}>Update</Button>
+            <Button size="small" onClick={handleDelete}>Delete</Button>
           </CardActions>
+          <Snackbar open={error} autoHideDuration={6000} onClose={() => setError(false)}>
+            <Alert onClose={() => setError(false)} severity="error" sx={{ width: '100%' }}>
+              Failed to delete cat. Please try again.
+            </Alert>
+            </Snackbar>
         </Card>
     );
 }
