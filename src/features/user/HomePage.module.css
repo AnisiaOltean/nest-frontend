@@ -1,0 +1,20 @@
+.container {
+    height: 100vh;
+    display: grid;
+    grid-template-columns: 30% 70%; /* Profile | Cats list */
+    gap: 1rem;
+    padding: 1rem;
+    box-sizing: border-box;
+}
+
+.profile {
+    background-color: #f5f5f5;
+    padding: 1rem;
+    border-radius: 8px;
+}
+
+.catsList {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}

@@ -23,3 +23,10 @@ export interface Cat {
     breed: string;
     isFed?: boolean;
 }
+
+export interface CatDetails {
+    name: string;
+    breed: string;
+    isFed: boolean;
+    ownerId: number;
+}
