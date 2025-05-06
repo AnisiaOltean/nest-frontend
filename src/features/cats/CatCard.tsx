@@ -60,7 +60,7 @@ export const CatCard = ({ id, name, breed, lastFed }: Cat) => {
             <Alert onClose={() => setError(false)} severity="error" sx={{ width: '100%' }}>
               Failed to delete cat. Please try again.
             </Alert>
-            </Snackbar>
+          </Snackbar>
         </Card>
     );
 }

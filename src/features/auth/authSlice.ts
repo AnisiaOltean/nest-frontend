@@ -98,6 +98,7 @@ export const authSlice = createSlice({
             state.isLoading = true;
         })
         .addCase(login.fulfilled, (state, action) => {
+            state.isError = false;
             state.isLoading = false;
             state.isSuccess = true;
             state.jwt = action.payload.access_token;
@@ -105,6 +106,7 @@ export const authSlice = createSlice({
             state.user = action.payload.user;
         })
         .addCase(login.rejected, (state) => {
+            state.isError = true;
             state.isLoading = false;
             state.isAuthenticated = false;
             state.isSuccess = false;

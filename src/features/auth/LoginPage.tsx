@@ -6,13 +6,14 @@ import { useNavigate } from "react-router";
 import { User } from "../../app/types";
 import { login, reset } from "./authSlice";
 import { CircularProgress } from "@mui/material";
+import { Snackbar, Alert } from "@mui/material";
 
 export const LoginPage = () => {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
 
     const dispatch = useAppDispatch();
-    const { isLoading, isSuccess, isAuthenticated } = useAppSelector((state) => state.auth);
+    const { isLoading, isSuccess, isError, isAuthenticated } = useAppSelector((state) => state.auth);
     const navigate = useNavigate();
 
     useEffect(() => {
@@ -68,5 +69,10 @@ export const LoginPage = () => {
                     <p>Don't have an account yet? <Button onClick={() => navigate('/register')}>Register</Button></p>
                 </div> 
             </form>
+            <Snackbar open={isError}>
+                <Alert severity="error" sx={{ width: '100%' }}>
+                    Login failed!
+                </Alert>
+            </Snackbar>
     </Box>
 }
