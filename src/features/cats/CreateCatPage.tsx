@@ -5,11 +5,15 @@ import { useAppSelector } from "../../app/hooks/redux/hooks";
 import { useNavigate } from "react-router";
 import { CatDetails } from "../../app/types";
 import { Snackbar, Alert } from "@mui/material";
+import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
+import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
+import { DateCalendar } from '@mui/x-date-pickers/DateCalendar';
+import { Dayjs } from 'dayjs';
 
 export const CreateCatPage = () => {
     const [name, setName] = useState("");
     const [breed, setBreed] = useState("");
-    const [isFed, setIsFed] = useState(false);
+    const [selectedDate, setSelectedDate] = useState<Dayjs | null>(null);
     const [error, setShowError] = useState(false);
 
     const [createCat, { isLoading }] = useCreateCatMutation();
@@ -24,7 +28,7 @@ export const CreateCatPage = () => {
         const createdCat: CatDetails = {
             name: name,
             breed: breed,
-            isFed: isFed,
+            lastFed: selectedDate?.format("YYYY-MM-DD") ?? "",
             ownerId: user.id
         }
 
@@ -53,15 +57,14 @@ export const CreateCatPage = () => {
                 onChange={(e) => setBreed(e.target.value)} 
                 required 
             />
-            <FormControlLabel
-                control={
-                    <Checkbox 
-                        checked={isFed} 
-                        onChange={(e) => setIsFed(e.target.checked)} 
-                    />
-                }
-                label="Is Fed"
-            />
+            <LocalizationProvider dateAdapter={AdapterDayjs}>
+                <DateCalendar
+                    value={selectedDate}
+                    onChange={(newValue) => {
+                    setSelectedDate(newValue);
+                    }}
+                />
+            </LocalizationProvider>
             <Button type="submit" variant="contained" color="primary" disabled={isLoading}>
                 {isLoading ? 'Adding...' : 'Add Cat'}
             </Button>

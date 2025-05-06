@@ -40,9 +40,11 @@ export const catApi = createApi({
           providesTags: (result, error, userId) => [{ type: 'Cats' as const, id: String(userId) }],
         }),
 
-        getCatById: builder.query<Cat, string>({
-          query: (catId) => `cats/${catId}`,
+        getCatById: builder.query<Cat, { catId: string; ownerId: number}>({
+          query: ({catId, ownerId}) => `cats/${catId}`,
+          providesTags: (result, error, { catId, ownerId }) => [{ type: 'Cats' as const, id: String(ownerId) }],
         }),
+
         updateCat: builder.mutation<Cat, { catId: string; details: CatDetails}>({
           query: ({catId, details}) => ({
             url: `cats/${Number(catId)}`,

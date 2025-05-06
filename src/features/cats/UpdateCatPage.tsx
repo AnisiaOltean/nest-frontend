@@ -7,29 +7,41 @@ import { CatDetails } from "../../app/types";
 import { Snackbar, Alert } from "@mui/material";
 import { useParams } from 'react-router-dom';
 import { useEffect } from "react";
+import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
+import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
+import { DateCalendar } from '@mui/x-date-pickers/DateCalendar';
+import dayjs, { Dayjs } from 'dayjs';
+
 
 export const UpdateCatPage = () => {
     const { id } = useParams();
-    const { data } = useGetCatByIdQuery(id!, {
-        skip: !id,
-    });
     const { user } = useAppSelector(state => state.auth);
+
+    const { data } = useGetCatByIdQuery(
+        { catId: id!, ownerId: user?.id! }, 
+        {
+          skip: !id || !user?.id,
+        }
+    );
+
     const navigate = useNavigate();
     const [updateCat, { isLoading }] = useUpdateCatMutation();
 
     const [name, setName] = useState("");
     const [breed, setBreed] = useState("");
-    const [isFed, setIsFed] = useState(false);
+    const [selectedDate, setSelectedDate] = useState<Dayjs | null>(null);
     const [isError, setShowError] = useState(false);
 
     useEffect(() => {
         if (data) {
           setName(data.name || "");
           setBreed(data.breed || "");
-          setIsFed(!!data.isFed);
+          setSelectedDate(data.lastFed ? dayjs(data.lastFed) : null);
         }
     }, [data]);
 
+    console.log(data);
+    console.log(selectedDate);
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
 
@@ -38,7 +50,7 @@ export const UpdateCatPage = () => {
         const createdCat: CatDetails = {
             name: name,
             breed: breed,
-            isFed: isFed,
+            lastFed: selectedDate?.format('YYYY-MM-DD') ?? "",
             ownerId: user.id
         }
 
@@ -67,15 +79,14 @@ export const UpdateCatPage = () => {
                 onChange={(e) => setBreed(e.target.value)} 
                 required 
             />
-            <FormControlLabel
-                control={
-                    <Checkbox 
-                        checked={isFed} 
-                        onChange={(e) => setIsFed(e.target.checked)} 
-                    />
-                }
-                label="Is Fed"
-            />
+            <LocalizationProvider dateAdapter={AdapterDayjs}>
+                <DateCalendar
+                    value={selectedDate}
+                    onChange={(newValue) => {
+                    setSelectedDate(newValue);
+                    }}
+                />
+            </LocalizationProvider>
             <Button type="submit" variant="contained" color="primary" disabled={isLoading}>
                 {isLoading ? 'Updating...' : 'Update Cat'}
             </Button>

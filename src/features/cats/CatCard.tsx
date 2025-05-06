@@ -11,8 +11,9 @@ import { useDeleteCatMutation } from "./CatsAPI";
 import { useAppSelector } from "../../app/hooks/redux/hooks";
 import { useState } from "react";
 import { Snackbar, Alert } from "@mui/material";
+import dayjs from "dayjs";
 
-export const CatCard = ({ id, name, breed, isFed }: Cat) => {
+export const CatCard = ({ id, name, breed, lastFed }: Cat) => {
     const navigate = useNavigate();
     const [ deleteCat ] = useDeleteCatMutation();
     const { user } = useAppSelector((state) => state.auth);
@@ -43,11 +44,12 @@ export const CatCard = ({ id, name, breed, isFed }: Cat) => {
               {name}
             </Typography>
             <Typography variant="body2" sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-             isFed: {isFed ? (
-                        <SentimentSatisfiedAltIcon color="success" />
-                    ) : (
-                        <SentimentDissatisfiedIcon color="error" />
-                    )}
+             Last Fed at: {lastFed}
+              {dayjs().diff(dayjs(lastFed), 'day') <= 1 ? (
+                <SentimentSatisfiedAltIcon color="success" />
+              ) : (
+                  <SentimentDissatisfiedIcon color="error" />
+              )}
             </Typography>
           </CardContent>
           <CardActions>

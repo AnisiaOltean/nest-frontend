@@ -21,12 +21,12 @@ export interface Cat {
     id?: number;
     name: string;
     breed: string;
-    isFed?: boolean;
+    lastFed?: string;
 }
 
 export interface CatDetails {
     name: string;
     breed: string;
-    isFed: boolean;
+    lastFed: string;
     ownerId: number;
 }
