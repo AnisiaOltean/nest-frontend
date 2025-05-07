@@ -47,7 +47,7 @@ export const catApi = createApi({
 
         updateCat: builder.mutation<Cat, { catId: string; details: CatDetails}>({
           query: ({catId, details}) => ({
-            url: `cats/${Number(catId)}`,
+            url: `cats/${catId}`,
             method: 'PATCH',
             body: details,
           }),
