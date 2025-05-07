@@ -36,7 +36,7 @@ export const catApi = createApi({
         }),
       
         getCatsForUser: builder.query<Cat[], string>({
-          query: (userId) => `cats?ownerId=${userId}`,
+          query: (userId) => `cats`,
           providesTags: (result, error, userId) => [{ type: 'Cats' as const, id: String(userId) }],
         }),
 

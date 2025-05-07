@@ -1,7 +1,6 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import { JWT, StoredUser, User } from "../../app/types";
 import authService from "./AuthAPI";
-import { RootState } from "../../app/store";
 
 const storedUser: string | null = localStorage.getItem('user');
 const user: StoredUser | null = !!storedUser ? JSON.parse(storedUser) : null;
@@ -134,8 +133,4 @@ export const authSlice = createSlice({
 });
 
 export const { reset } = authSlice.actions; 
-export const selectedUser = (state: RootState) => {
-    return state.auth;
-}
-
 export default authSlice.reducer;

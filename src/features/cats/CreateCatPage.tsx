@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { TextField, Checkbox, FormControlLabel, Button } from "@mui/material";
+import { TextField, Button } from "@mui/material";
 import { useCreateCatMutation } from "./CatsAPI";
 import { useAppSelector } from "../../app/hooks/redux/hooks";
 import { useNavigate } from "react-router";
