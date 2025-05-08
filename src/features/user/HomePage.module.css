@@ -1,7 +1,7 @@
 .container {
     height: 100vh;
     display: grid;
-    grid-template-columns: 30% 70%; /* Profile | Cats list */
+    grid-template-columns: 30% 70%;
     gap: 1rem;
     padding: 1rem;
     box-sizing: border-box;

@@ -11,7 +11,7 @@ import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { DateCalendar } from '@mui/x-date-pickers/DateCalendar';
 import dayjs, { Dayjs } from 'dayjs';
-
+import styles from './Form.module.css';
 
 export const UpdateCatPage = () => {
     const { id } = useParams();
@@ -40,8 +40,6 @@ export const UpdateCatPage = () => {
         }
     }, [data]);
 
-    console.log(data);
-    console.log(selectedDate);
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
 
@@ -65,7 +63,7 @@ export const UpdateCatPage = () => {
 
     return (
         <>
-        <form onSubmit={handleSubmit} style={{ maxWidth: 400, margin: "2rem auto", display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+        <form onSubmit={handleSubmit} className={styles.form}>
             <h2>Update Cat</h2>
             <TextField 
                 label="Name" 

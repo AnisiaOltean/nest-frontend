@@ -310,3 +310,46 @@ export const CreateCatPage = () => {
 }
 ```
 Here, the api slice has generated the useCatCreationMutation() to acess the createCat() method, along with additional options { isLoading } that control the fetching behaviour of the hook. So now we don't have to manually define isLoading as a state variable by hand, RTK Query will do that for us. Notice that in this component we also use the { user } state defined in the manually created authStore using the useAppSelector hook which allows us to access the app state in our React component.
+We have also created a <PrivateRoute /> component to protect all routes inside App.tsx (doubles the validation that is already done on the backend using NestJS Guards) by dispatching the verifyJwt() thunk that checks if the token is expired or not. If it is expired, it automatically redirects the user to the login page. 
+```
+export const PrivateRoute = ({ page }: { page: JSX.Element }) => {
+  const { isSuccess, isAuthenticated, jwt } = useAppSelector(
+    (state) => state.auth
+  );
+
+  const dispatch = useAppDispatch();
+
+  useEffect(() => {
+    if (!jwt || !jwt?.access_token) return;
+
+    dispatch(verifyJwt(jwt.access_token));
+  }, [jwt, isSuccess]);
+
+
+  return isAuthenticated ? page : <Navigate replace to='/login' />;
+};
+```
+
+Finally, we provide the store defined in app/store.ts inside the src/main.tsx file by wrapping the <App /> component around the redux <Provider> and passing the store as prop:
+```
+import { StrictMode } from "react";
+import { createRoot } from "react-dom/client";
+import { Provider } from "react-redux";
+import { App } from "./App";
+import { store } from "./app/store";
+import "./index.css";
+
+const container = document.getElementById("root")
+
+... 
+
+  root.render(
+    <StrictMode>
+      <Provider store={store}>
+        <App />
+      </Provider>
+    </StrictMode>,
+  )
+  
+... 
+```

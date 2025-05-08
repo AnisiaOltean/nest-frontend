@@ -1,12 +1,12 @@
 import { Box, Button, TextField, Typography } from "@mui/material";
 import { useState, FormEvent, useEffect } from "react";
-import styles from "./LoginPage.module.css";
 import { useAppDispatch, useAppSelector } from "../../app/hooks/redux/hooks";
 import { useNavigate } from "react-router";
 import { User } from "../../app/types";
 import { login, reset } from "./authSlice";
 import { CircularProgress } from "@mui/material";
 import { Snackbar, Alert } from "@mui/material";
+import styles from "./LoginPage.module.css";
 
 export const LoginPage = () => {
     const [email, setEmail] = useState("");
@@ -43,15 +43,9 @@ export const LoginPage = () => {
 
     if(isLoading) return <CircularProgress/>
 
-    return <Box
-            display="flex"
-            flexDirection="column"
-            alignItems="center"
-            justifyContent="center"
-            minHeight="100vh"
-            gap={2}>
+    return <div className={styles.formContainer}>
             <Typography variant="h2">Login</Typography>
-            <form onSubmit={onSubmitHandler} style={{ display: "flex", flexDirection: "column", gap: 16 }}>
+            <form onSubmit={onSubmitHandler} className={styles.loginForm}>
                 <TextField
                 label="Email"
                 type="email"
@@ -74,5 +68,5 @@ export const LoginPage = () => {
                     Login failed!
                 </Alert>
             </Snackbar>
-    </Box>
+    </div>
 }

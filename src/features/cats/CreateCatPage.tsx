@@ -9,6 +9,8 @@ import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { DateCalendar } from '@mui/x-date-pickers/DateCalendar';
 import { Dayjs } from 'dayjs';
+import styles from "./Form.module.css";
+
 
 export const CreateCatPage = () => {
     const [name, setName] = useState("");
@@ -43,7 +45,7 @@ export const CreateCatPage = () => {
 
     return (
         <>
-        <form onSubmit={handleSubmit} style={{ maxWidth: 400, margin: "2rem auto", display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+        <form onSubmit={handleSubmit} className={styles.form}>
             <h2>Add a New Cat</h2>
             <TextField 
                 label="Name" 
