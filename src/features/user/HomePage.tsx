@@ -9,13 +9,11 @@ import { useNavigate } from "react-router";
 import WavingHandTwoToneIcon from '@mui/icons-material/WavingHandTwoTone';
 
 export const HomePage = () => {
-    const { isAuthenticated, user } = useAppSelector((state) => state.auth);
+    const { user } = useAppSelector((state) => state.auth);
     console.log(user);
     const dispatch = useAppDispatch();
     
-    const { data, isLoading } = useGetCatsForUserQuery(
-        isAuthenticated && user?.id ? String(user.id) : skipToken
-    );
+    const { data, isLoading } = useGetCatsForUserQuery();
 
     const navigate = useNavigate();
 
