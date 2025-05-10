@@ -27,7 +27,7 @@ export const CatCard = ({ id, name, breed, lastFed }: Cat) => {
       if(!user) return;
 
         try {
-          await deleteCat({catId: id!}).unwrap();
+          await deleteCat({catId: id!, ownerId: user.id}).unwrap();
           navigate('/');
         } catch (err) {
           setError(true);

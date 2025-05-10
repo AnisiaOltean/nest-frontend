@@ -207,17 +207,17 @@ export const catApi = createApi({
           invalidatesTags: (result, error, args) => [{ type: 'Cats' as const }],
         }),
       
-        getCatsForUser: builder.query<Cat[], void>({
+        getCatsForUser: builder.query<Cat[], {ownerId: Number}>({
           query: () => `cats`,
-          providesTags: (result, error, args) => 
+          providesTags: (result, error, {ownerId}) => 
             result
-          ? [...result.map(({ id }) => ({ type: 'Cats' as const, id: String(id) })), 'Cats']
+          ? [...result.map(({ id }) => ({ type: 'Cats' as const, id: String(ownerId) })), 'Cats']
           : ['Cats'],
         }),
 
-        getCatById: builder.query<Cat, { catId: string; }>({
+        getCatById: builder.query<Cat, { catId: string; ownerId: number}>({
           query: ({catId}) => `cats/${catId}`,
-          providesTags: (result, error, { catId }) => [{ type: 'Cats' as const, id: String(catId) }],
+          providesTags: (result, error, { catId, ownerId }) => [{ type: 'Cats' as const, id: String(ownerId) }],
         }),
 
         updateCat: builder.mutation<Cat, { catId: string; details: CatDetails}>({
@@ -226,15 +226,15 @@ export const catApi = createApi({
             method: 'PATCH',
             body: details,
           }),
-          invalidatesTags: (result, error, { catId }) => [{ type: 'Cats', id: String(catId) }],
+          invalidatesTags: (result, error, { catId, details }) => [{ type: 'Cats', id: String(details.ownerId) }],
         }),
 
-        deleteCat: builder.mutation<void, { catId: number }>({
+        deleteCat: builder.mutation<void, { catId: number; ownerId: number }>({
           query: ({catId }) => ({
             url: `cats/${catId}`,
             method: 'DELETE',
           }),
-          invalidatesTags: (result, error, { catId }) => [{ type: 'Cats', id: String(catId) }],
+          invalidatesTags: (result, error, { catId, ownerId }) => [{ type: 'Cats', id: String(ownerId) }],
         }),
       }),
 });
@@ -243,12 +243,12 @@ export const { useCreateCatMutation, useGetCatByIdQuery, useGetCatsForUserQuery,
 ```
 A key feature of RTK Query is caching data from servers such that when additional requests are performed, the existing cache will be provided instead of running a new API call to the server. This is why we have used invalidating cache tags to automate refetching for query endpoints that are affected by other mutation endpoints. For example, the query getCatsForUser provides specific tags for all cat objects in the result response array and the general 'Cats' tag or just the generic 'Cats' tag if the result is undefined.
 ```
- providesTags: (result, error, args) => 
+  providesTags: (result, error, {ownerId}) => 
             result
-          ? [...result.map(({ id }) => ({ type: 'Cats' as const, id: String(id) })), 'Cats']
+          ? [...result.map(({ id }) => ({ type: 'Cats' as const, id: String(ownerId) })), 'Cats']
           : ['Cats'],
 ``` 
-which will trigger a refetch of the endpoint whenever another mutation endpoint like updateCat invalidates a specific tag: `invalidatesTags: (result, error, { catId }) => [{ type: 'Cats', id: String(catId) }],` or createCat `invalidatesTags: (result, error, args) => [{ type: 'Cats' as const }]` which uses the generic 'Cats' tag for invalidation.
+which will trigger a refetch of the endpoint whenever another mutation endpoint like updateCat invalidates a specific tag: `invalidatesTags: (result, error, { catId, details }) => [{ type: 'Cats', id: String(details.ownerId) }],` or createCat `invalidatesTags: (result, error, args) => [{ type: 'Cats' as const }]` which uses the generic 'Cats' tag for invalidation.
 Finally, RTK Query also provides generated react hooks for the endpoint and mutation type. This allows us to use the data proivided by the hooks in our components:
 ```
 export const CreateCatPage = () => {

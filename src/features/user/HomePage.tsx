@@ -1,6 +1,5 @@
 import { useGetCatsForUserQuery } from "../cats/CatsAPI";
 import { useAppSelector, useAppDispatch } from "../../app/hooks/redux/hooks";
-import { skipToken } from "@reduxjs/toolkit/query";
 import { Button } from "@mui/material";
 import { logout } from "../auth/authSlice";
 import { CatCard } from "../cats/CatCard";
@@ -13,7 +12,7 @@ export const HomePage = () => {
     console.log(user);
     const dispatch = useAppDispatch();
     
-    const { data, isLoading } = useGetCatsForUserQuery();
+    const { data, isLoading } = useGetCatsForUserQuery({ownerId: user!.id}, {skip: !user});
 
     const navigate = useNavigate();
 

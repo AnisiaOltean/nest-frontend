@@ -18,9 +18,9 @@ export const UpdateCatPage = () => {
     const { user } = useAppSelector(state => state.auth);
 
     const { data } = useGetCatByIdQuery(
-        { catId: id! }, 
+        { catId: id!, ownerId: user!.id }, 
         {
-          skip: !id,
+          skip: !id || !user
         }
     );
 
