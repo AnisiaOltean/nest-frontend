@@ -14,8 +14,17 @@ Redux Toolkit (RTK) provides utilities to simplify writing Redux logic code, suc
 - creating reducers (with the createSlice function)
 - abstracting the dispatch actions before-during-and after async requests with createAsyncThunk; createAsyncThunk automatically generates three action types (pending, fulfilled and rejected) which are used in the extraReducers to modify the state
 
+Our app has the following contents inside `src/` folder:
+- `app/` folder: contains a `hook/` folder with the hooks used in the app, along with `store.ts` in which the store is defined and `types.ts` with the interfaces of our datastructures
+- `features/`: contains the app features: 
+  - `auth/` folder with the `Auth.API` for the axios backend calls, `auth.slice` for the authentication slice and related React components `LoginPage.tsx`, `RegistrationPage.tsx` and `PrivateRoute.tsx` (used to wrap all pages in our routes defined in `src/App.tsx`)
+  - `cats/` folder: contains RTK Query service generated in `CatsAPI.ts` and the relevant pages `CreateCatPage.tsx`, 'UpdateCatPage.tsx', `CatCard.tsx` and some shared css styling in `Form.module.css`
+  - `user/` folder: defines the `HomePage.tsx`and styling inside `HomePage.module.css`
+
+  The application routes are defined inside the `src/App.tsx` file which provides the App() component and the routes defined with `react-router-dom`. Finally, the entry point of the app is the `main.tsx` file used to render the App component().
+
 The Redux store is the central "bucket" in which the application state is stored. In our application, the store is configured by passing two reducers paths, one used for authentication (auth) and the other one for API calls on the cats/ endpoint (catApi).
-```
+ ```
 app/store.ts
 export const store = configureStore({
   reducer: {
@@ -29,10 +38,12 @@ export const store = configureStore({
 export type RootState = ReturnType<typeof store.getState>;
 export type AppDispatch = typeof store.dispatch;
 ```
-The store defined above also contains the default middleware along with the catApi.middleware. The catApi middleware is important here, because catApi uses RTK Query which automatically generates automatically generates and returns an API service "slice" object structure including the reducers and react hooks that allow the usage of the queries or mutations defined in the endpoints. 
+The store defined above also contains the default middleware along with the catApi.middleware. The catApi middleware is important here, because catApi uses RTK Query which automatically generates and returns an API service "slice" object structure including the reducers and react hooks that allow the usage of the queries or mutations defined in the endpoints. 
 
 For authentication, we have defined the authSlice slice that contains the reducer logic to manage the authentication logic. The authentication state contains information about the logged user, the generated JWT (by the jwt-guard in nest.js) and some additional flags (isAuthenticated, isError, isSuccess) which are used in our components.
 ```
+authSlice.ts 
+
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import { JWT, StoredUser, User } from "../../app/types";
 import authService from "./AuthAPI";
@@ -144,6 +155,8 @@ In the file above, we have manually defined login, logout and register functions
 
 In order to acces the state in React components, we have used two typed Redux hooks:
 ```
+app/hooks/redux/hooks.ts 
+
 import { useDispatch, useSelector, TypedUseSelectorHook } from "react-redux"
 import type { AppDispatch, RootState } from "../../store";
 
@@ -168,8 +181,10 @@ In this case, thunks are used for writing the asynchronous logic in our Redux ap
 
 Async thunks in Redux are introduced for easily creating and dispatching actions describing asynchronous requests. Usually, an async requests requires an action dispatched before the request (like a loading indicator when fetching items from an API) and another "success" or "failure" action, depending on the resolved promise. The createAsyncThunk API in Redux automatically generates thunks that automatically dispatch those "start/success/failure" actions for us (pending, fullfiled and rejected). In createAsyncThunk, we only need to specify a string that will be used as the prefix for the generated action types and a A "payload creator" callback function that returns a Promise with some data. We can listen to actions defined outside of the slice inside the extraReducers, where for each state (pending, fulfilled, rejected) we can access the state and payload through the parameters `(state, action)`, where action is represents the resolved value defined inside the async function (thunk).
 
-For the cats/ endpoint, Redux Toolkit Query (RTK Query) was used because it is a powerful tool that simplifies loading data in our web application, eliminating the need to write data fetching and logic by hand. In this case, RTK Query generates React hooks that encapsulate the entire data fetching process, provide data and isLoading fields to components, and manage the lifetime of cached data as components mount and unmount. Integrating RTK Query begins by creating an API slice with createApi where we have defined the "endpoints" from where data is retrieved and sent to (without having to manually write the requests using axios, like the case of authentication).
+For the cats/ endpoint, Redux Toolkit Query (RTK Query) was used because it is a powerful tool that simplifies loading data in our web application, eliminating the need to write data fetching and logic by hand. In this case, RTK Query generates React hooks that encapsulate the entire data fetching process, provide data and isLoading fields to components, and manage the lifetime of cached data as components mount and unmount. Integrating RTK Query begins by creating an API slice with `createApi` where we have defined the "endpoints" from where data is retrieved and sent to (without having to manually write the requests using axios, like the case of authentication).
 ```
+CatsAPI.ts 
+
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 import { CatDetails, Cat, JWT } from "../../app/types";
 
@@ -251,6 +266,7 @@ A key feature of RTK Query is caching data from servers such that when additiona
 which will trigger a refetch of the endpoint whenever another mutation endpoint like updateCat invalidates a specific tag: `invalidatesTags: (result, error, { catId }) => [{ type: 'Cats', id: String(catId) }],` or createCat `invalidatesTags: (result, error, args) => [{ type: 'Cats' as const }],` which uses the generic 'Cats' tag for invalidation.
 Finally, RTK Query also provides generated react hooks for the endpoint and mutation type. This allows us to use the data proivided by the hooks in our components:
 ```
+CreateCatPage.tsx
 export const CreateCatPage = () => {
     const [name, setName] = useState("");
     const [breed, setBreed] = useState("");
@@ -322,6 +338,8 @@ export const CreateCatPage = () => {
 Here, the api slice has generated the useCatCreationMutation() to acess the createCat() method, along with additional options { isLoading } that control the fetching behaviour of the hook. So now we don't have to manually define isLoading as a state variable by hand, RTK Query will do that for us. Notice that in this component we also use the { user } state defined in the manually created authStore using the useAppSelector hook which allows us to access the app state in our React component.
 We have also created a <PrivateRoute /> component to protect all routes inside App.tsx (doubles the validation that is already done on the backend using NestJS Guards) by dispatching the verifyJwt() thunk that checks if the token is expired or not. If it is expired, it automatically redirects the user to the login page. 
 ```
+auth/PrivateRoute.tsx
+
 export const PrivateRoute = ({ page }: { page: JSX.Element }) => {
   const { isSuccess, isAuthenticated, jwt } = useAppSelector(
     (state) => state.auth
@@ -342,6 +360,8 @@ export const PrivateRoute = ({ page }: { page: JSX.Element }) => {
 
 Finally, we provide the store defined in app/store.ts inside the src/main.tsx file by wrapping the <App /> component around the redux <Provider> and passing the store as prop:
 ```
+main.tsx 
+
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 import { Provider } from "react-redux";
