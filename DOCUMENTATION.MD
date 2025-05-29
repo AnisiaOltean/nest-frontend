@@ -7,6 +7,13 @@
 - or delete an existing app 
 ### This is a basic CRUD application for which React along with Redux Toolkit were used for building the UI and managing application state 
 
+## Short introduction on React
+[React.js](https://react.dev/learn) is a JavaScript library used for building user interfaces using components written is JSX syntax. In this projects, the following were used:
+- the basic `useState` and `useNavigate` (`react-router`) hooks for dealing with local state and navigation, respectivelly
+- [MaterialUI](https://mui.com/material-ui/) (`@mui/material`) as a library that provides React components
+- [Redux Toolkit](https://redux-toolkit.js.org/introduction/getting-started) (`@reduxjs/toolkit`) and [Redux Toolkit Query](https://redux-toolkit.js.org/rtk-query/overview) (`@reduxjs/toolkit/query/react`) for managing global state
+
+## Redux Toolkit and Redux Toolkit Query (RTK Query)
 In Redux, the global state of an app is stored in an object called store. The only way to change the state is to create an action (an object describing what happened) and dispatch it to the store. Reducers are then used to specify how state gets updated according to the dispatched action. Reducers are functions that calculate a new state based on the old state and the action. 
 
 Redux Toolkit (RTK) provides utilities to simplify writing Redux logic code, such as:
@@ -177,11 +184,16 @@ where useAppDispatch is used to dispatch actions to reducers via the store and u
         .... 
     });
 ```
-In this case, thunks are used for writing the asynchronous logic in our Redux app. A thunk function is a function that accepts two arguments: the dispatch methdod and getState method (of the Redux store). Thunk functions are usually called via the store.dispatch() method and allow to wrote redux logic outside the UI layer. Reducers cannot contain side effects, which is why thunks are used as a place to put those side effects outside our components. 
+In this case, thunks are used for writing the asynchronous logic in our Redux app. A thunk function is a function that accepts two arguments: the dispatch method and getState method (of the Redux store). Thunk functions are usually called via the store.dispatch() method and allow to wrote redux logic outside the UI layer. Reducers cannot contain side effects, which is why thunks are used as a place to put those side effects outside our components. 
 
-Async thunks in Redux are introduced for easily creating and dispatching actions describing asynchronous requests. Usually, an async requests requires an action dispatched before the request (like a loading indicator when fetching items from an API) and another "success" or "failure" action, depending on the resolved promise. The createAsyncThunk API in Redux automatically generates thunks that automatically dispatch those "start/success/failure" actions for us (pending, fullfiled and rejected). In createAsyncThunk, we only need to specify a string that will be used as the prefix for the generated action types and a A "payload creator" callback function that returns a Promise with some data. We can listen to actions defined outside of the slice inside the extraReducers, where for each state (pending, fulfilled, rejected) we can access the state and payload through the parameters `(state, action)`, where action is represents the resolved value defined inside the async function (thunk).
+Async thunks in Redux are introduced for easily creating and dispatching actions describing asynchronous requests. Usually, an async requests requires an action dispatched before the request (like a loading indicator when fetching items from an API) and another "success" or "failure" action, depending on the resolved promise. The createAsyncThunk API in Redux generates thunks that automatically dispatch those "start/success/failure" actions for us (pending, fullfiled and rejected). In createAsyncThunk, we only need to specify a string that will be used as the prefix for the generated action types and a A "payload creator" callback function that returns a Promise with some data. We can listen to actions defined outside of the slice inside the extraReducers, where for each state (pending, fulfilled, rejected) we can access the state and payload through the parameters `(state, action)`, where action is represents the resolved value defined inside the async function (thunk).
 
-For the cats/ endpoint, Redux Toolkit Query (RTK Query) was used because it is a powerful tool that simplifies loading data in our web application, eliminating the need to write data fetching and logic by hand. In this case, RTK Query generates React hooks that encapsulate the entire data fetching process, provide data and isLoading fields to components, and manage the lifetime of cached data as components mount and unmount. Integrating RTK Query begins by creating an API slice with `createApi` where we have defined the "endpoints" from where data is retrieved and sent to (without having to manually write the requests using axios, like the case of authentication).
+For the cats/ endpoint, Redux Toolkit Query (RTK Query) was used because it is a powerful tool that simplifies loading data in our web application, eliminating the need to write data fetching and logic by hand. RTK QUery provides the following API:
+- createApi(): used to define endpoints and how data is retrieved from the endpoints
+- fetchBaseQuery(): it is a small wrapper around fetch() to simplify making requests
+
+In this case, RTK Query generates React hooks that encapsulate the entire data fetching process, provide data and isLoading fields to components, and manage the lifetime of cached data as components mount and unmount. Integrating RTK Query begins by creating an API slice with `createApi` where we have defined the "endpoints" from where data is retrieved and sent to (without having to manually write the requests using axios, like the case of authentication).
+
 ```
 CatsAPI.ts 
 
